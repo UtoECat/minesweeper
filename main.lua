@@ -1,5 +1,5 @@
 --[[
-ECS-Editor
+Minesweeper
 Copyright (C) UtoECat 2022-2022
 
 This program is free software: you can redistribute it and/or modify
@@ -16,28 +16,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ]]
 
--- For hot reloading :)
-local orig = {}
-
-for k,v in pairs(_G) do
-	orig[k] = v
-end
-_ORIGINAL_G = orig
-
-orig = {}
-for k,v in pairs(package.loaded) do
-	orig[k] = v
-end
-_ORIGINAL_LOADED = orig
-
 local a = {} -- stringificated number cache
 for i = 0, 1000, 1 do
 	a[i] = tostring(i)
 end
 
+local tochar = string.char
+local b = {}
+for i = 0, 255 do
+	b[i] = string.char(i)
+end
+
+_CACHE_CHAR = b
 _CACHE_NUM = a
 
 collectgarbage('restart')
-
-dofile("maincode.lua")
 
