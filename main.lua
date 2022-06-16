@@ -16,6 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ]]
 
+-- Пресоздаём некоторые константные строки :)
+
 local a = {} -- stringificated number cache
 for i = 0, 1000, 1 do
 	a[i] = tostring(i)
@@ -30,5 +32,46 @@ end
 _CACHE_CHAR = b
 _CACHE_NUM = a
 
+-- Перезапускаем сборщик мусора
 collectgarbage('restart')
 
+-- Получаем некоторые платформоспецефичные значения
+PATH_DELIM = string.sub(package.config, 1, 1)
+
+-- Некоторые полезные функции
+
+local _require = require
+local _dofile = dofile
+
+function makepath(first, ...) -- делает путь из аргументов :)
+	local str = first
+	local len = select("#", ...)
+	
+	for i = 1, len do
+		str = str .. PATH_DELIM .. tostring(select(i, ...))
+	end
+	return str
+end
+
+function require(...) -- замена require
+	local fin = makepath(...)
+	if not fin then
+		error("No module name or path passed!")
+	else
+		return _require(fin)
+	end
+end
+
+function dofile(...) -- замена dofile :)
+	local fin = makepath(...)
+	if not fin then
+		error("No module name or path passed!")
+	else
+		return _dofile(fin)
+	end
+end
+
+inspect = require("src", "inspect").inspect
+json = require("src", "json")
+
+dofile("src", "main.lua")
