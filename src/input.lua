@@ -1,6 +1,6 @@
 --[[
 This file is a part of Minesweeper game
-Copyright (C) UtoECat 2022-2022
+Copyright (C) UtoECat 2022
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ]]
 
-local utoecat = Texture("res", "shit_maker.jpg")
-
-function love.draw()
-	drawCenter(utoecat, utoecat:getWidth()/2*0.5, utoecat:getWidth()/2*0.5, 0.5, 0.5, 0)
+function Texture(...)
+	local path = makepath(...)
+	return love.graphics.newImage(path)
 end
+
+

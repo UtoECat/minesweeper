@@ -1,5 +1,5 @@
 --[[
-Minesweeper
+This file is a part of Minesweeper game
 Copyright (C) UtoECat 2022-2022
 
 This program is free software: you can redistribute it and/or modify

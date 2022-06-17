@@ -1,5 +1,5 @@
 --[[
-Minesweeper
+This file is a part of Minesweeper game
 Copyright (C) UtoECat 2022-2022
 
 This program is free software: you can redistribute it and/or modify
@@ -40,8 +40,8 @@ PATH_DELIM = string.sub(package.config, 1, 1)
 
 -- Некоторые полезные функции
 
-local _require = require
-local _dofile = dofile
+_require = require
+_dofile = dofile
 
 function makepath(first, ...) -- делает путь из аргументов :)
 	local str = first
@@ -71,7 +71,91 @@ function dofile(...) -- замена dofile :)
 	end
 end
 
+--for k in next, love._modules do
+	--_G[k] = love[k]
+--end
+
+-- замена стандартного цикла
+
+local loopfunc = function()
+		-- Process events.
+		if love.event then
+			love.event.pump()
+			for name, a,b,c,d,e,f in love.event.poll() do
+				if name == "quit" then
+					if love.quit then
+						love.quit()
+					end
+					os.exit()
+				end
+				love.handlers[name](a,b,c,d,e,f)
+			end
+		end
+
+		-- Update dt, as we'll be passing it to update
+		dt = love.timer.step()
+
+		-- Call update and draw
+		if love.update then love.update(dt) end -- will pass 0 if love.timer is disabled
+
+		if love.graphics and love.graphics.isActive() then
+			love.graphics.origin()
+			love.graphics.clear(love.graphics.getBackgroundColor())
+
+			if love.draw then love.draw() end
+
+			love.graphics.present()
+		end
+
+		love.timer.sleep(0.001)
+end
+
+-- цикл с проверкой на ошибки
+
+function love.run()
+	if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
+	love.math.setRandomSeed(os.time())
+	love.timer.step()
+
+	local dt = 0
+
+	return function() -- custom error handler here :)
+		local suc, msg
+		if not ERR then
+			suc, msg = xpcall(loopfunc, debug.traceback)
+			if suc then return end
+			print(msg)
+			ERR = msg
+		else
+			while ERR do
+				for e, a, b, c in love.event.poll() do 
+					if e == "keypressed" and a == "escape" then
+						ERR = nil
+					elseif e == "quit" then
+						if love.quit then love.quit() end
+						os.exit()
+					end
+				end
+				love.event.pump()
+				love.timer.step()
+				if love.graphics.isActive() then
+					love.graphics.origin()
+					love.graphics.clear(32/255, 64/255, 128/255)
+					love.graphics.setColor(255,255,255)
+					love.graphics.printf("Error : "..tostring(ERR).."\n\n\n\nPress ESC to restart", 50, 50, love.graphics.getWidth()-100)
+					love.graphics.present()
+				end
+				love.timer.sleep(0.001)
+			end
+			-- конец цикла
+		end
+	end
+	-- hehe
+end
+
 inspect = require("src", "inspect").inspect
 json = require("src", "json")
+Object = require("src", "object")
+require("src", "draw")
 
 dofile("src", "main.lua")
