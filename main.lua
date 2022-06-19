@@ -67,7 +67,7 @@ function dofile(...) -- замена dofile :)
 	if not fin then
 		error("No module name or path passed!")
 	else
-		return _dofile(fin)
+		return love.filesystem.load(fin)()
 	end
 end
 
@@ -142,7 +142,8 @@ function love.run()
 					love.graphics.origin()
 					love.graphics.clear(32/255, 64/255, 128/255)
 					love.graphics.setColor(255,255,255)
-					love.graphics.printf("Error : "..tostring(ERR).."\n\n\n\nPress ESC to restart", 50, 50, love.graphics.getWidth()-100)
+					love.graphics.printf("Error : "..tostring(ERR).."\n\n\n\nPress ESC to restart", 
+						50, 50, love.graphics.getWidth()-100, "left", 0, 1.5)
 					love.graphics.present()
 				end
 				love.timer.sleep(0.001)
@@ -153,9 +154,13 @@ function love.run()
 	-- hehe
 end
 
+os.clock = love.timer.getTime
 inspect = require("src", "inspect").inspect
 json = require("src", "json")
+base = require("src", "base")
 Object = require("src", "object")
 require("src", "draw")
+input = require("src", "input")
+require("src", "sound")
 
 dofile("src", "main.lua")

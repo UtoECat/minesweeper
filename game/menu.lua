@@ -16,46 +16,27 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ]]
 
+local font = Font()
+local bomb = Texture("res", "bomb.png")
 local mouse = input.getDevice("mouse")
+local boom = Sound(false, "res", "boom.ogg")
+local theme = Sound(true, "res", "menu.mp3")
 
-input.registerKey("up", "keyboard", "w")
-input.registerKey("down", "keyboard", "s")
-input.registerKey("left", "keyboard", "a")
-input.registerKey("right", "keyboard", "d")
+local t = {}
 
-WIN = input.getDevice("window");
-
-local SCREEN = nil
-local newscr = nil
-local alpha = 255
-
-function setScreen(t)
-	if newscr then SCREEN = newscr end
-	newscr = t
-	if t.init then t.init() end
+function t.init()
+	theme:loop(true)
+	theme:play()
 end
 
-function love.draw()
+function t.draw()
 	draw.color(255,255,255)
-	if SCREEN then SCREEN.draw() end
-	draw.color(0, 0, 0, alpha)
-	draw.rect(0, 0, WIN.w, WIN.h)
+	draw.rect(0,0, WIN.w, WIN.h)
+	bomb:drawCenter(mouse.x, mouse.y, 55, 55, 0)
 end
 
-function love.update()
-	if newscr then
-		alpha = alpha + 5
-		if alpha >= 255 then
-			SCREEN = newscr
-			newscr = nil
-		end
-	else
-		if alpha > 1 then
-			alpha = alpha - 5
-		end
-	end
-	if SCREEN then SCREEN.update() end
-	input.update()
+function t.update()
+	
 end
 
-setScreen(dofile("game", "intro.lua"))
+return t

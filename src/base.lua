@@ -116,5 +116,9 @@ end
 
 function vec.nor (a, b)
 	local x = vec.len(a, b)
-	return (x ~= 0) and vec.scale(a, b, 1.0/x) or a, b;
+	if (x ~= 0) then
+		return vec.scale(a, b, 1.0/x)
+	else
+		return a, b
+	end
 end;
