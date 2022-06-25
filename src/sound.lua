@@ -18,26 +18,75 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local snd = Object("Sound")
 
-local test = love.audio.newSource(makepath("res", "boom.ogg"), "static")
-local func = {"play", "pause", "stop", "seek", "tell", "getPitch", "getVolume"}
+local debug = function() end
 
-print(inspect(debug.getmetatable(test)))
+local test = love.audio.newSource(makepath("res", "boom.ogg"), "static")
+local func = { "getPitch", "getVolume"}
+
+--debug(inspect(debug.getmetatable(test)))
 
 for _, name in pairs(func) do
-	local faa = debug.getmetatable(test)[name]
 	snd[name] = function(self, ...)
-		faa(self.sound, ...)
+		return self.sound[name](self.sound, ...)
 	end
 end
 
 function Sound(stream, ...)
 	local obj = snd:instance()
-	obj.sound = love.audio.newSource(makepath(...), stream and "stream" or "static")
+	local path = makepath(...)
+	obj.sound = love.audio.newSource(path, stream and "stream" or "static")
+	obj.errstart = false
+	obj.path = path
+	debug("SOUND: created "..tostring(obj).." path:'"..path.."' length:"..tostring(obj:length()))
 	return obj
 end
 
+local function checksnd(sound)
+	sound.sound:play()
+	if not sound.sound:isPlaying() then
+		sound:seek(1)
+		error("I hate this!"..inspect(sound))
+	end
+	sound.errstart = false
+end
+
+function snd:play()
+	debug("SOUND: played "..tostring(self))
+	local b = self.sound:play()
+	if not b then
+		self.errstart = true
+		self.sound:seek(1);
+		self.sound:setVolume(0.1);
+		Event(checksnd, self).clock = os.clock() + 5
+	end
+end
+
 function snd:volume(val)
+	if val < 0 or val > 1 then
+		-- If you will pass negative volume to sound : ALL LOVE sound engine will be broked :D
+		-- Buggy shit
+		print("SOUND: trying to set STRANGE volume "..tostring(val).." for "..tostring(self))
+		val = math.max(math.min(val, 0.001), 1.0)
+	end
 	self.sound:setVolume(val)
+end
+
+function snd:pause()
+	debug("SOUND: paused "..tostring(self))
+	self.sound:pause()
+end
+
+function snd:stop()
+	debug("SOUND: stopped "..tostring(self))
+	self.sound:stop()
+end
+
+function snd:seek(val)
+	return self.sound:seek(val)
+end
+
+function snd:tell()
+	return self.sound:tell()
 end
 
 function snd:loop(val)
@@ -45,13 +94,23 @@ function snd:loop(val)
 end
 
 function snd:is_looping(val)
-	self.sound:isLooping(val)
+	return self.sound:isLooping(val)
 end
 
 function snd:is_playing(val)
-	self.sound:isPlaying(val)
+	return self.sound:isPlaying(val) or self.errstart
 end
 
 function snd:pitch(val)
 	self.sound:setPitch(val)
+end
+
+function snd:release(val)
+	debug("SOUND: DESTROYED "..tostring(self))
+	self.sound:release(val)
+	self.sound = nil
+end
+
+function snd:length(val)
+	return self.sound:getDuration()
 end

@@ -19,10 +19,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 function coll_rect(a, b)
 	local check = a and b or error("bad rec passed");
 	if a == b then 
-		return b
+		return a
 	end
 	if a.x < b.x+b.w and b.x < a.x+a.w and a.y < b.y+b.h and b.y < a.y+a.h then 
-		return b 
+		return a 
+	else 
+		return nil
+	end
+end
+
+function coll_rect_xor(a, b)
+	local check = a and b or error("bad rec passed");
+	if a == b then 
+		return nil
+	end
+	if a.x < b.x+b.w and b.x < a.x+a.w and a.y < b.y+b.h and b.y < a.y+a.h then 
+		return a 
 	else 
 		return nil
 	end

@@ -31,6 +31,7 @@ function Texture(...)
 	else
 		obj = base:instance()
 		local tex = love.graphics.newImage(path)
+		tex:setFilter("nearest", "nearest")
 		obj.texture = tex
 		obj.w = tex:getWidth()
 		obj.h = tex:getHeight()

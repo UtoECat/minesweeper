@@ -18,6 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 -- Пресоздаём некоторые константные строки :)
 
+jit.off()
+
 local a = {} -- stringificated number cache
 for i = 0, 1000, 1 do
 	a[i] = tostring(i)
@@ -159,8 +161,14 @@ inspect = require("src", "inspect").inspect
 json = require("src", "json")
 base = require("src", "base")
 Object = require("src", "object")
+require("src", "mempool")
+require("src", "event")
+
 require("src", "draw")
 input = require("src", "input")
 require("src", "sound")
+require("src", "music")
+
+GUI = require("src", "gui")
 
 dofile("src", "main.lua")

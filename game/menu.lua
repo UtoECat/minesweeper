@@ -20,23 +20,28 @@ local font = Font()
 local bomb = Texture("res", "bomb.png")
 local mouse = input.getDevice("mouse")
 local boom = Sound(false, "res", "boom.ogg")
-local theme = Sound(true, "res", "menu.mp3")
+local gui = GUI()
 
 local t = {}
 
 function t.init()
-	theme:loop(true)
-	theme:play()
+	gui:new(50,50,50,50).onclick = function() print("hehe"); nextMusic() end
+	gui:new(110,50,50,50).onclick = function() print("hehe"); stopMusic() end
+	gui:new(170,50,50,50).onclick = function() print("hehe"); dbgMusic() end
+	playMusicPlaylist(dir2playlist("test"))
 end
 
 function t.draw()
 	draw.color(255,255,255)
 	draw.rect(0,0, WIN.w, WIN.h)
 	bomb:drawCenter(mouse.x, mouse.y, 55, 55, 0)
+	gui:draw()
+	draw.color(0,0,255)
+	font:draw(tostring(love.audio.getActiveSourceCount()), 200,200,40)
 end
 
 function t.update()
-	
+	gui:update()
 end
 
 return t

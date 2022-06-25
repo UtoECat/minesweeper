@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local mouse = input.getDevice("mouse")
 
+input.registerKey("lmb", "mouse", 1)
 input.registerKey("up", "keyboard", "w")
 input.registerKey("down", "keyboard", "s")
 input.registerKey("left", "keyboard", "a")
@@ -43,6 +44,7 @@ function love.draw()
 end
 
 function love.update()
+	updateMusic()
 	if newscr then
 		alpha = alpha + 5
 		if alpha >= 255 then
@@ -56,6 +58,7 @@ function love.update()
 	end
 	if SCREEN then SCREEN.update() end
 	input.update()
+	poolEvents()
 end
 
 setScreen(dofile("game", "intro.lua"))
