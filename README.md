@@ -1,2 +1,3 @@
 # minesweeper
-minesweeper game :D
+minesweeper game :D   
+In development
