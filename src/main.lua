@@ -19,10 +19,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 local mouse = input.getDevice("mouse")
 
 input.registerKey("lmb", "mouse", 1)
-input.registerKey("up", "keyboard", "w")
-input.registerKey("down", "keyboard", "s")
-input.registerKey("left", "keyboard", "a")
-input.registerKey("right", "keyboard", "d")
+input.registerKey("select", "mouse", 1, "keyboard", "return")
+input.registerKey("up", "keyboard", "w", "keyboard", "up")
+input.registerKey("down", "keyboard", "s", "keyboard", "down")
+input.registerKey("left", "keyboard", "a", "keyboard", "left")
+input.registerKey("right", "keyboard", "d", "keyboard", "right")
 
 WIN = input.getDevice("window");
 

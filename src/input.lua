@@ -18,14 +18,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 local inmt = {}
 
-function upd_key (dev, self)
-	local new = dev.rawkeys[self.id];
+function upd_key (self)
+	local new
+	for i = 1, #self.array, 2 do
+		new = self.array[i].rawkeys[self.array[i+1]] or new;
+	end
+	
 	if new ~= self.down then
 		if new then
 			self.pressed = true;
-			--print("Key with id "..tostring(self.id).." pressed!");
+			--print("key "..self.name.." prerssed!");
 		else 
 			self.released = true;
+			--print("key "..self.name.." released!");
 		end;
 	else 
 		if new then
@@ -33,7 +38,8 @@ function upd_key (dev, self)
 		else 
 			self.released = false;
 		end;
-	end;
+	end
+	
 	self.down = new;
 end;
 
@@ -58,7 +64,6 @@ local input = {
 	device = {
 		mouse = {
 			rawkeys = {};
-			key_upd = upd_key;
 			key_reg = function(d, a) return type(a)=="number" and a or error("input: bad key_id") end;
 			x = 0;
 			y = 0;
@@ -72,7 +77,6 @@ local input = {
 		},
 		keyboard = {
 			rawkeys = {};
-			key_upd = upd_key;
 			key_reg = function(d, a) return type(a)=="string" and a or error("input: bad key_id") end;
 		},
 		window = {
@@ -84,7 +88,6 @@ local input = {
 		gamepad = {
 			rawaxis = {},
 			rawkeys = {},
-			key_upd = upd_key,
 			joy_upd = joy_upd_gamepad,
 			joy_reg = function(d, a) return type(a)=="string" and a or error("input: bad axis_id") end,
 			key_reg = function(d, a) return type(a)=="string" and a or error("input: bad key_id") end;
@@ -104,21 +107,29 @@ function inmt.getKey(name)
 	return k;
 end
 
-function inmt.registerKey(name, devname, keyid)
-	local dev = input.device[devname];
-	if not dev then error("input: bad device name "..tostring(devname)) end;
-	if type(name) ~= "string" then error("input: bad key name!") end
+function inmt.registerKey(name, ...)
+	if type(name) ~= "string" then 
+		error("input: bad key name!")
+	end
 	
-	local k = {id = 0, device = dev};
-	k.id = dev.key_reg and dev:key_reg(keyid, k) or error(
-		"input: mpossible to register keys for device" .. devname .. "!"
-	);
-	k.down = false;
-	k.pressed = false;
-	k.released = false;
-	input.keys[name] = k;
+	local array = {}
+	local k = {array = array, device = dev, name = name}
 	
-	print("input: registered key "..name.." for device "..devname.." with id "..tostring(keyid))
+	for i = 1, select("#", ...), 2 do
+		local devname = select(i, ...)
+		local keyid = select(i+1, ...)
+		array[i] = input.device[devname] or error("input: bad device name "..tostring(devname))
+		array[i+1] = array[i].key_reg and array[i]:key_reg(keyid) or error(
+			"input: mpossible to register keys for device" .. devname .. "!"
+		);
+	end
+	
+	k.down = false
+	k.pressed = false
+	k.released = false
+	input.keys[name] = k
+	
+	print("input: registered key "..name)
 	return k
 end
 
@@ -183,8 +194,7 @@ end
 
 function inmt.update()
 	for name, key in pairs(input.keys) do
-		local dev = key.device;
-		dev.key_upd(dev, key);
+		upd_key(key);
 	end
 	for name, j in pairs(input.joysticks) do
 		local dev = j.device;
@@ -280,4 +290,3 @@ function StartInput()
 end
 
 return input;
-

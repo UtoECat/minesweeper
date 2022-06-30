@@ -36,6 +36,7 @@ function t.init()
 	KEY = kb.lastkey
 	MKEY = mouse.lastkey
 	GKEY = gmp.lastkey
+	bump:volume(VAR_VOLUME_SOUND)
 end
 
 function t.draw()
@@ -60,7 +61,7 @@ function t.update()
 			A = A + S + 5
 		else
 			K = 255/2
-			bump:volume(S/2)
+			bump:volume((S/2) * VAR_VOLUME_SOUND)
 			S = -S * 0.5
 			bump:stop()
 			bump:play()

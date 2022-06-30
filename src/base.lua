@@ -40,6 +40,14 @@ function coll_rect_xor(a, b)
 	end
 end
 
+function dist_rect(a, b, x, y, kx, ky) -- distance between rectangles
+	local check = a and b or error("bad rec passed");
+	if a == b then 
+		return 0
+	end
+	return vec.distcoef(a.x+(a.w/2), a.y+(a.h/2), b.x+(b.w/2)*x, b.y+(b.h/2)*y, kx, ky)
+end
+
 function math.clamp (val, min, max) -- clamp value
 	local v = (val > max) and max or val;
 	return (v < min) and min or v;
@@ -103,6 +111,12 @@ function vec.distance (a, b, c, d) -- distance between two vectors
 	return math.sqrt((a - c)*(a - c) + (b - d)*(b - d));
 end;
 
+function vec.distcoef (a, b, c, d, x, y) -- distance between two vectors with coefficients
+	local x = x or 1
+	local y = y or 1
+	return math.sqrt((a - c)*(a - c)*x + (b - d)*(b - d)*y);
+end;
+
 local PI = math.pi or 3.1415
 
 function vec.angle (a, b, c, d) -- calculate angle in X-axis
@@ -118,6 +132,10 @@ end
 function vec.refl (a, b, c, d) -- calculate reflected vector to normal
 	local dotp = vec.dot(a, b, c, d); -- dot product
 	return a - (2 * c) * dotp, b - (2 * d) * dotp;
+end
+
+function vec.comp (a, b, c, d) 
+	return a == b and c == d
 end
 
 function vec.rotate (a, b, angle) -- rotate by angle

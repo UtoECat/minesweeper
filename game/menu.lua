@@ -25,10 +25,14 @@ local gui = GUI()
 local t = {}
 
 function t.init()
-	gui:new(50,50,50,50).onclick = function() print("hehe"); nextMusic() end
-	gui:new(110,50,50,50).onclick = function() print("hehe"); stopMusic() end
-	gui:new(170,50,50,50).onclick = function() print("hehe"); dbgMusic() end
-	playMusicPlaylist(dir2playlist("test"))
+	gui:new(110,0,50,50).onclick = function() print("up!"); end
+	gui:new(110,120,50,50).onclick = function() print("down!"); end
+	gui:new(110,180,50,50).onclick = function() print("down!"); end
+	gui:new(110,240,50,50).onclick = function() print("down!"); end
+	gui:new(50,60,50,50).onclick = function() print("hehe"); nextMusic() end
+	gui:new(110,60,50,50).onclick = function() print("hehe"); stopMusic() end
+	gui:new(170,60,50,50).onclick = function() print("hehe"); dbgMusic() end
+	playMusicPlaylist(dir2playlist("res", "music"))
 end
 
 function t.draw()

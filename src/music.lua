@@ -18,8 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 -- High-level sound system :p
 
-VAR_VOLUME_SOUND = 0.5
-VAR_VOLUME_MUSIC = 0.4
+VAR_VOLUME_SOUND = 0.4
+VAR_VOLUME_MUSIC = 0.8
 VAR_VOLUME_COEFFICIENT = 0.02
 
 function playSound(...)
@@ -47,7 +47,9 @@ function updateMusic()
 			old_music:stop()
 			old_music:release()
 			old_music = nil
-			volume = 1.0
+			if music then
+				volume = 1.0 - VAR_VOLUME_COEFFICIENT
+			end
 		end
 	elseif music and volume < 1.0 - VAR_VOLUME_COEFFICIENT then
 		volume = volume + VAR_VOLUME_COEFFICIENT
@@ -66,6 +68,9 @@ function push_new(m)
 	end
 	old_music = music
 	music = m
+	if m then
+		m:volume(volume)
+	end
 end
 
 function dbgMusic()
@@ -134,7 +139,7 @@ function dir2playlist(...)
 				table.remove(pl, i) -- remove audio from playlist :)
 				print(v.." is not a file")
 			else
-				local arg = v:sub(v:find("%.[^%.]*$"))
+				local arg = v:sub(v:find("%.[^%.]*$") or 1)
 				if not check_format[arg] then
 					print("format "..arg.." is not valid. Skipping...")
 					table.remove(pl, i)
@@ -151,7 +156,6 @@ function dir2playlist(...)
 		return function() -- playlist function
 			local v
 			local key = pl.key
-			print("getting next music")
 			while not v do
 				key, v = inext(pl, key)
 			end

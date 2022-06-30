@@ -77,7 +77,7 @@ end
 
 local function sorter(a, b) return a.z < b.z end
 
-local function calleachret(arr, fun, ...) -- call un foreach obj in arr
+local function calleachret(arr, fun, ...) -- call fun foreach obj in arr
 	local len = #arr
 	local i = 1
 	while i <= len do
@@ -90,13 +90,50 @@ local function calleachret(arr, fun, ...) -- call un foreach obj in arr
 	return nil
 end
 
+local function nearestrect(arr, fun, rect, ...) --nearest object
+	local len = #arr
+	local curr
+	local val = 9999999
+	
+	local i = 1
+	while i <= len do
+		local aa = fun(arr[i], rect, ...)
+		if aa < val and aa ~= 0 then
+			val = aa
+			curr = arr[i]
+		end
+		i = i + 1
+	end
+	return curr, val
+end
+
 function gui:update() 
 	--sorting gui by Z
 	table.sort(self.array, sorter)
 	-- check some stuff :D
 	local mouse = input.getDevice("mouse")
+	local kleft = input.getKey("left")
+	local kright = input.getKey("right")
+	local kup = input.getKey("up")
+	local kdown = input.getKey("down")
 	-- get new object to be selected
 	local newsel = calleachret(self.array, coll_rect_xor, mouse)
+	
+	if mouse.xdiff == 0 and mouse.ydiff == 0 then
+		newsel = self.selected
+		local rect = self.selected or self.array[1]
+		if not rect then return end
+		
+		if kleft.pressed then
+			newsel = nearestrect(self.array, dist_rect, rect, 0, 1, 1, 0.5)
+		elseif kright.pressed then
+			newsel = nearestrect(self.array, dist_rect, rect, 2, 1, 1, 0.5)
+		elseif kup.pressed then
+			newsel = nearestrect(self.array, dist_rect, rect, 1, 0, 0.5, 1)
+		elseif kdown.pressed then
+			newsel = nearestrect(self.array, dist_rect, rect, 1, 2, 0.5, 1)
+		end
+	end
 	
 	if newsel ~= self.selected then -- reselecting :)
 		if self.selected then
@@ -113,18 +150,21 @@ function gui:update()
 			return -- nothing to do :p
 		end
 		
-		if coll_rect(curr, mouse) then
-			if input.getKey("lmb").pressed then
+		if coll_rect(curr, mouse) or (mouse.xdiff == 0 and mouse.ydiff == 0) then
+			if input.getKey("select").pressed then
 				curr:click(false, mouse.x - curr.x, mouse.y - curr.y)
 			end
-			if input.getKey("lmb").released then
+			if input.getKey("select").released then
 				curr:click(true, mouse.x - curr.x, mouse.y - curr.y)
 			end
 			if mouse.wheel ~= 0 then
 				curr:scroll(mouse.wheel)
 			end
 		end
-		
+	end
+	
+	for _, gel in pairs(self.array) do -- update all gui elements, that have this field
+		if gel.update then gel:update() end
 	end
 end
 
