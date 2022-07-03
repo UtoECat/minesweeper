@@ -19,18 +19,45 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 local gui = Object("Gui");
 local blob = Object("Gui.Blob");
 
+GuiColorScheme = {
+	backSelect = {200, 200, 200},
+	backPress = {200,200,0},
+	backPassive = {128,128,128},
+	fontPassive = {0,0,0},
+	fontPress = {0,0,0},
+	fontSelect = {0,0,0},
+	outlineSelect = {64,0,0},
+	outlinePress = {128,0,0},
+	outlinePassive = {0,0,0},
+	inSelect = {255,255,255,64},
+	inPassive = {255,255,255,32},
+	roundness = 10,
+	lineWidth = 1,
+	defaultFont = Font()
+}
+
 -- Blob in GUI
 
 function blob:draw()
 	if self.selected then
-		draw.color(200,200,200)
+		draw.colort(GuiColorScheme.backSelect)
 		if self.clicked then
-			draw.color(200,200,0)
+			draw.colort(GuiColorScheme.backPress)
 		end
 	else
-		draw.color(128,128,128)
+		draw.colort(GuiColorScheme.backPassive)
 	end
-	draw.rect(self.x, self.y, self.w, self.h)
+	draw.rect(self.x, self.y, self.w, self.h, GuiColorScheme.roundness)
+	if self.selected then
+		draw.colort(GuiColorScheme.outlineSelect)
+		if self.clicked then
+			draw.colort(GuiColorScheme.outlinePress)
+		end
+	else
+		draw.colort(GuiColorScheme.outlinePassive)
+	end
+	draw.size(GuiColorScheme.lineWidth)
+	draw.rect(self.x, self.y, self.w, self.h, GuiColorScheme.roundness, true)
 end
 
 function blob:select(bool)
@@ -122,16 +149,16 @@ function gui:update()
 	if mouse.xdiff == 0 and mouse.ydiff == 0 then
 		newsel = self.selected
 		local rect = self.selected or self.array[1]
-		if not rect then return end
+		if not rect then goto final end
 		
 		if kleft.pressed then
-			newsel = nearestrect(self.array, dist_rect, rect, 0, 1, 1, 0.5)
+			newsel = nearestrect(self.array, dist_rect, rect, 0, 1, 1, 100)
 		elseif kright.pressed then
-			newsel = nearestrect(self.array, dist_rect, rect, 2, 1, 1, 0.5)
+			newsel = nearestrect(self.array, dist_rect, rect, 2, 1, 1, 100)
 		elseif kup.pressed then
-			newsel = nearestrect(self.array, dist_rect, rect, 1, 0, 0.5, 1)
+			newsel = nearestrect(self.array, dist_rect, rect, 1, 0, 100, 1)
 		elseif kdown.pressed then
-			newsel = nearestrect(self.array, dist_rect, rect, 1, 2, 0.5, 1)
+			newsel = nearestrect(self.array, dist_rect, rect, 1, 2, 100, 1)
 		end
 	end
 	
@@ -147,22 +174,32 @@ function gui:update()
 		local curr = self.selected
 		
 		if not curr then
-			return -- nothing to do :p
+			goto final -- nothing to do :p
 		end
 		
 		if coll_rect(curr, mouse) or (mouse.xdiff == 0 and mouse.ydiff == 0) then
+			local stx = mouse.x
+			local sty = mouse.y
+			
+			stx = math.max(math.min(mouse.x - curr.x, curr.w), 0)
+			sty = math.max(math.min(mouse.y - curr.y, curr.h), 0)
+			
 			if input.getKey("select").pressed then
-				curr:click(false, mouse.x - curr.x, mouse.y - curr.y)
+				curr:click(false, stx, sty)
 			end
 			if input.getKey("select").released then
-				curr:click(true, mouse.x - curr.x, mouse.y - curr.y)
+				curr:click(true, stx, sty)
 			end
 			if mouse.wheel ~= 0 then
 				curr:scroll(mouse.wheel)
 			end
+			if (mouse.xdiff ~= 0 or mouse.ydiff ~= 0) and curr.moving and coll_rect(curr, mouse) then
+				curr:moving(stx, sty)
+			end
 		end
 	end
 	
+	::final::
 	for _, gel in pairs(self.array) do -- update all gui elements, that have this field
 		if gel.update then gel:update() end
 	end
@@ -180,6 +217,11 @@ function gui:new(x, y, w, h, z)
 	self.array[#self.array + 1] = o
 	return o
 end
+
+require("src", "gui", "button")
+require("src", "gui", "vscroll")
+require("src", "gui", "scroll")
+require("src", "gui", "image")
 
 return function()
 	local o = gui:instance()

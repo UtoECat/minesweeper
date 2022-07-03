@@ -202,6 +202,7 @@ function inmt.update()
 	end
 	input.device.mouse.xdiff = 0
 	input.device.mouse.ydiff = 0
+	input.device.mouse.wheel = 0
 	input.device.mouse.lastkey = nil
 	input.device.keyboard.lastkey = nil
 	input.device.gamepad.lastkey = nil

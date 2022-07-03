@@ -30,7 +30,10 @@ function Texture(...)
 		obj = loaded[path]
 	else
 		obj = base:instance()
-		local tex = love.graphics.newImage(path)
+		local suc, tex = pcall(love.graphics.newImage, path)
+		if not suc then
+			tex = love.graphics.newImage("error.png")
+		end
 		tex:setFilter("nearest", "nearest")
 		obj.texture = tex
 		obj.w = tex:getWidth()
@@ -109,6 +112,14 @@ draw = {}
 
 function draw.color(r, g, b, a)
 	love.graphics.setColor(r/255, g/255, b/255, (a or 255)/255)
+end
+
+function draw.colort(arr)
+	love.graphics.setColor(arr[1]/255, arr[2]/255, arr[3]/255, (arr[4] or 255)/255)
+end
+
+function draw.size(v)
+	love.graphics.setLineWidth(v or 1)
 end
 
 function draw.line(...)

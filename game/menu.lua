@@ -32,6 +32,10 @@ function t.init()
 	gui:new(50,60,50,50).onclick = function() print("hehe"); nextMusic() end
 	gui:new(110,60,50,50).onclick = function() print("hehe"); stopMusic() end
 	gui:new(170,60,50,50).onclick = function() print("hehe"); dbgMusic() end
+	GuiButton(gui, 300, 240, 150, 50, 0, "Heloo!", function() print "lmao" end)
+	GuiVerticalScroll(gui, 300, 300, 150, 50, 0, "value =", 0.5)
+	GuiHorizontalScroll(gui, 500, 50, 50, 200, 0, 1, 50)
+	GuiImage(gui, 300, 400, 150, 150, 0, Texture("res", "shit_maker.jpg"))
 	playMusicPlaylist(dir2playlist("res", "music"))
 end
 

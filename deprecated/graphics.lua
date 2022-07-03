@@ -194,6 +194,7 @@ function sprites.getTexture (filename) -- internal function, don't use it
 			print("Can't load texture "..filename.."! Getting error texture...")
 			if filename ~= "error.png" then
 				sprites.tex_loaded[filename] = sprites.getTexture("error.png")
+				tex = sprites.tex_loaded[filename]
 			else
 				error("Fatal : no error texture founded! Add error.png file to game resource folder!")
 			end
